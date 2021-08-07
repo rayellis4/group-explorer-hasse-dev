@@ -227,7 +227,7 @@ class AbstractPartition {
       return `{ ${this.subsets[0].name} ... ${this.subsets[this.subsets.length-1].name} }`
    }
 
-   destroy() {
+   destroy = () => {
       this.subsets.forEach( (subset) => subset.destroy() );
       if ($('#partitions li').length == 0) {
          $('#partitions_placeholder').show();
@@ -299,7 +299,7 @@ class ConjugacyClasses extends AbstractPartition {
                       .show();
    }
 
-   destroy() {
+   destroy = () => {
       $('#partitions li.conjugacyClass').remove();
       super.destroy();
    }
@@ -324,7 +324,7 @@ class OrderClasses extends AbstractPartition {
                       .show();
    }
 
-   destroy() {
+   destroy = () => {
       $('#partitions li.orderClass').remove();
       super.destroy();
    }
@@ -361,7 +361,7 @@ class Cosets extends AbstractPartition {
                       .show();
    }
 
-   destroy() {
+   destroy = () => {
       $(`#partitions li.${this.side}coset${this.subgroup.subgroupIndex}`).remove();
       super.destroy();
    }
@@ -396,7 +396,7 @@ class SubsetEditor {
    }
 
    // Create new subset from ssedit-in-elements-list, make sure it's formatted, and close editor
-   static accept() {
+   static accept = () => {
       new Subset(
          $('#ssedit-in-elements-list > li')
             .map( (_, el) => parseInt($(el).attr('element')) )
@@ -405,11 +405,11 @@ class SubsetEditor {
       SubsetEditor.close()
    }
 
-   static close() {
+   static close = () => {
       $('#subset-editor').remove();
    }
 
-   static addElement(event /*: JQueryEventObject */) {
+   static addElement = (event /*: JQueryEventObject */) => {
       event.preventDefault();
       const dragEvent = ((event.originalEvent /*: any */) /*: DragEvent */);
       if (dragEvent != undefined && dragEvent.dataTransfer != undefined) {
@@ -418,7 +418,7 @@ class SubsetEditor {
       }
    }
 
-   static removeElement(event /*: JQueryEventObject */) {
+   static removeElement = (event /*: JQueryEventObject */) => {
       event.preventDefault();
       const dragEvent = ((event.originalEvent /*: any */) /*: DragEvent */);
       if (dragEvent != undefined && dragEvent.dataTransfer != undefined) {
@@ -449,7 +449,7 @@ function initSubsetMenu() {
 
 function subsetClickHandler (event /*: MouseEvent */) {
    event.preventDefault();
-   const $action = $(event.target).closest('[action]');
+   const $action = $(((event.target /*: any */) /*: HTMLElement */)).closest('[action]');
    if ($action.length != 0) {
       event.stopPropagation();
       eval($action.attr('action'));
@@ -491,7 +491,7 @@ function touchHandler(touchEvent /*: TouchEvent */) {
 function displayElements(event /*: Event */, location /*: eventLocation */) {
    event.preventDefault();
    GEUtils.cleanWindow();
-   const $curr = $(event.target).closest('li');
+   const $curr = $(((event.target /*: any */) /*: HTMLElement */)).closest('li');
    const id = $curr.attr('id');
    if (id != undefined) {
       const subset = displayList[parseInt(id)];
@@ -532,14 +532,14 @@ function makeLongList(id /*: groupElement */, template_name /*: string */) /*: h
 function showHeaderMenu(event /*: MouseEvent */) {
    GEUtils.cleanWindow();
    const $menus = $(eval(Template.HTML('header-menu-template')))
-         .appendTo($(event.target).closest('[action]')[0]);
+         .appendTo($(((event.target /*: any */) /*: HTMLElement */)).closest('[action]')[0]);
    Menu.addMenus($menus, event, subsetClickHandler);
 }
 
 function showMenu(event /*: MouseEvent */, id /*: number */) {
    GEUtils.cleanWindow();
    const $menus = displayList[id].menu
-         .appendTo($(event.target).closest('li'));
+         .appendTo($(((event.target /*: any */) /*: HTMLElement */)).closest('li'));
    Menu.addMenus($menus, event, subsetClickHandler);
 }
 

@@ -8,6 +8,10 @@ import * as SheetController from './js/SheetController.js'
 
 export { load }
 
+/*::
+import type { SheetCreateJSON } from './js/SheetModel.js'
+*/
+
 // Globals
 const HELP_PAGE /*: string */ = 'help/rf-um-sheetwindow/index.html'
 
@@ -36,20 +40,9 @@ function demo () {
   const rect = $('#graphic')[0].getBoundingClientRect()
   const scale = Math.min(rect.width, rect.height)
 
-  const jsonObject = [
-/*
+  const jsonObject /*: Array<SheetCreateJSON> */ = [
     {
-      id: 'Rectangle',
-      className: 'RectangleElement',
-      x: 0.1 * scale,
-      y: 0.3 * scale,
-      w: 0.05 * scale,
-      h: 0.1 * scale,
-      color: 'red'
-    },
-*/
-    {
-      id: 'Rectangle 1',
+      id: 1, // 'Rectangle 1',
       className: 'TextElement',
       x: 0.1 * scale,
       y: 0.3 * scale,
@@ -115,7 +108,7 @@ function demo () {
     {
       id: 'Connector',
       className: 'ConnectingElement',
-      sourceId: 'Rectangle 1',
+      sourceId: 1, // 'Rectangle 1',
       destinationId: 'Rectangle 2',
       color: 'black',
       thickness: 5,

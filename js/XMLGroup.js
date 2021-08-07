@@ -230,7 +230,7 @@ class XMLGroup extends BasicGroup {
       }
    }
 
-   get representationIsUserDefined () {
+   get representationIsUserDefined () /*: boolean */ {
       return this.representationIndex < 0
    }
 

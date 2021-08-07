@@ -116,7 +116,7 @@ function updateLocalStorage () {
   localStorage.setItem('GE-version', Version.label)
 }
 
-export async function check () {
+export async function check () /*: Promise<void> */ {
   let result = Promise.resolve()
 
   const thisLabel = Version.label
