@@ -215,14 +215,14 @@ function showSolvableDecompositionSheet ( type /*: VisualizerType */ ) {
         {
             className : 'TextElement',
             text : `Solvable Decomposition for the group ${Group.name}`,
-            x : L, y : T - 3*txtH, w : n*W + (n-1)*hgap, h : txtH,
+            x : L, y : T - 3*txtH, w : n*W + (n-1)*hgap,
             fontSize : '20pt', alignment : 'center'
         },
         {
             className : 'TextElement',
             text : 'The top row is the solvable decomposition.  '
                 + 'The bottom row are abelian quotient groups.',
-            x : L, y : T - 2*txtH, w : n*W + (n-1)*hgap, h : txtH,
+            x : L, y : T - 2*txtH, w : n*W + (n-1)*hgap,
             alignment : 'center'
         }
     ];
@@ -235,7 +235,7 @@ function showSolvableDecompositionSheet ( type /*: VisualizerType */ ) {
         sheetElementsAsJSON.push( {
             className : 'TextElement',
             text : groupName,
-            x : L+index*W+index*hgap, y : T-txtH, w : W, h : txtH,
+            x : L+index*W+index*hgap, y : T-txtH, w : W,
             alignment : 'center'
         } );
         // put visualizer for each element in top row, the decomposition
@@ -289,7 +289,7 @@ function showSolvableDecompositionSheet ( type /*: VisualizerType */ ) {
                     + (((previous.group /*: any */) /*: {name?: string} */).name || '(unnamed)') + ' ≅ '
                     + (((entry.quotientByPrevious /*: any */) /*: {name?: string} */).name || '(unnamed)'),
                 x : L+index*W+index*hgap+bottomShift, y : T+2*H+vgap+txtH/2,
-                w : W, h : txtH,
+                w : W,
                 alignment : 'center'
             } );
             // quotient map

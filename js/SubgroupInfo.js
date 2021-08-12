@@ -302,7 +302,7 @@ function showSubgroupLattice ( type /*: VisualizerType */ ) {
       className : 'TextElement',
       text : `Subgroup Lattice for the Group ${Group.name}`,
       x : latticeLeft, y : latticeTop / 2,
-      w : hSize * cellWidth, h : latticeTop / 2,
+      w : hSize * cellWidth,
       fontSize : '20pt', alignment : 'center'
    } );
    // Show the sheet.
@@ -316,7 +316,7 @@ function showEmbeddingSheet ( indexOfH /*: number */, type /*: VisualizerType */
       {
          className : 'TextElement',
          text : `Embedding ${libraryH.name} as <i>H</i><sub>${indexOfH}</sub> in ${Group.name}`,
-         x : 50, y : 50, w : 500, h : 40,
+         x : 50, y : 50, w : 500,
          fontSize : '20pt', alignment : 'center'
       },
       {
@@ -380,13 +380,13 @@ function showQuotientSheet ( indexOfN /*: number */, type /*: VisualizerType */)
    CreateNewSheet( [
       {
          className : 'TextElement',
-         x : L, y : T-100*adj, w : 5*W+4*gap, h : 50,
+         x : L, y : T-100*adj, w : 5*W+4*gap,
          text : `Short Exact Sequence showing ${Group.name} / ${libraryN.name} ≅ ${libraryQ.name}`,
          fontSize : `${20*adj}pt`, alignment : 'center'
       },
       {
          className : 'TextElement',
-         x : L, y : T-50, w : W, h : 50,
+         x : L, y : T-50, w : W,
          text : 'ℤ<sub>1</sub>',
          alignment : 'center', fontSize : `${12*adj}pt`
       },
@@ -397,7 +397,7 @@ function showQuotientSheet ( indexOfN /*: number */, type /*: VisualizerType */)
       },
       {
          className : 'TextElement',
-         x : L+W+gap, y : T-50, w : W, h : 50,
+         x : L+W+gap, y : T-50, w : W,
          text : libraryN.name, alignment : 'center', fontSize : `${12*adj}pt`
       },
       {
@@ -407,7 +407,7 @@ function showQuotientSheet ( indexOfN /*: number */, type /*: VisualizerType */)
       },
       {
          className : 'TextElement',
-         x : L+2*W+2*gap, y : T-50, w : W, h : 50,
+         x : L+2*W+2*gap, y : T-50, w : W,
          text : Group.name, alignment : 'center', fontSize : `${12*adj}pt`
       },
       {
@@ -417,7 +417,7 @@ function showQuotientSheet ( indexOfN /*: number */, type /*: VisualizerType */)
       },
       {
          className : 'TextElement',
-         x : L+3*W+3*gap, y : T-50, w : W, h : 50,
+         x : L+3*W+3*gap, y : T-50, w : W,
          text : libraryQ.name, alignment : 'center', fontSize : `${12*adj}pt`
       },
       {
@@ -427,7 +427,7 @@ function showQuotientSheet ( indexOfN /*: number */, type /*: VisualizerType */)
       },
       {
          className : 'TextElement',
-         x : L+4*W+4*gap, y : T-50, w : W, h : 50,
+         x : L+4*W+4*gap, y : T-50, w : W,
          text : 'ℤ<sub>1</sub>',
          alignment : 'center', fontSize : `${12*adj}pt`
       },
@@ -438,19 +438,19 @@ function showQuotientSheet ( indexOfN /*: number */, type /*: VisualizerType */)
       },
       {
          className : 'TextElement',
-         x : L+W+gap, y : T+H+25, w : W, h : 50,
+         x : L+W+gap, y : T+H+25, w : W,
          text : '<i>Im(id)</i> = <i>Ker(e)</i>',
          alignment : 'center', fontSize : `${12*adj}pt`
       },
       {
          className : 'TextElement',
-         x : L+2*W+2*gap, y : T+H+25, w : W, h : 50,
+         x : L+2*W+2*gap, y : T+H+25, w : W,
          text : '<i>Im(e)</i> = <i>Ker(q)</i>',
          alignment : 'center', fontSize : `${12*adj}pt`
       },
       {
          className : 'TextElement',
-         x : L+3*W+3*gap, y : T+H+25, w : W, h : 50,
+         x : L+3*W+3*gap, y : T+H+25, w : W,
          text : '<i>Im(q)</i> = <i>Ker(z)</i>',
          alignment : 'center', fontSize : `${12*adj}pt`
       },

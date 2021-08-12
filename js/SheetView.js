@@ -45,28 +45,22 @@ export class WindowUnits extends PhysicalUnits {
     sub: (PhysicalUnits) => WindowUnits
   */
   constructor (
-    arg1 /*: ?number | MouseEvent | TouchEvent | Touch | WindowUnits | DOMRect |  THREE.Vector2 */,
+    arg1 /*: ?number | {clientX: number, clientY: number} | {x: number, y: number} | TouchEvent */,
     y /*: ?number */
   ) {
     (typeof arg1 === 'number' && typeof y === 'number') ? super(arg1, y) : super()
-    if (arg1 != null) {
-      if (y == null) {
-        if (arg1 instanceof MouseEvent || arg1 instanceof Touch) {
-          this.set(arg1.clientX, arg1.clientY)
-        } else if (arg1 instanceof TouchEvent) {
-          if (arg1.type === 'touchend') {
-            this.set(arg1.changedTouches[0].clientX, arg1.changedTouches[0].clientY)
-          } else if (arg1.touches.length === 1) {
-            this.set(arg1.touches[0].clientX, arg1.touches[0].clientY)
-          } else { // average position of touches
-            this.set(...Array.from(arg1.touches)
-              .reduce(([x, y], touch) => [x + touch.clientX, y + touch.clientY], [0, 0])
-              .map((pos) => pos / arg1.touches.length))
-          }
-        } else if (arg1 instanceof THREE.Vector2) {
-          this.set(arg1.x, arg1.y)
-        } else if (arg1 instanceof DOMRect) {
-          this.set(arg1.x, arg1.y)
+    if (arg1 != null && y == null) {
+      if (typeof arg1.clientX === 'number' && typeof arg1.clientY === 'number') {
+        this.set(arg1.clientX, arg1.clientY)
+      } else if (typeof arg1.x === 'number' && typeof arg1.y === 'number') {
+        this.set(arg1.x, arg1.y)
+      } else if (arg1 instanceof TouchEvent) {
+        if (arg1.changedTouches.length === 1) {
+          this.set(arg1.changedTouches[0].clientX, arg1.changedTouches[0].clientY)
+        } else { // average position of touches
+          this.set(...Array.from(arg1.touches)
+            .reduce(([x, y], touch) => [x + touch.clientX, y + touch.clientY], [0, 0])
+            .map((pos) => pos / arg1.touches.length))
         }
       }
     }
@@ -262,7 +256,7 @@ export class NodeView extends SheetView {
     super(modelElement, domElement)
 
     $(this.domElement)
-      .addClass('draggable NodeElement')
+      .addClass('NodeElement draggable')
   }
 
   get center () /*: SheetUnits */ {
@@ -332,69 +326,44 @@ export class TextView extends NodeView {
       ? '#' + background.getHexString()
       : `rgba(${background.r * 100}%, ${background.g * 100}%, ${background.b * 100}%, ${this.modelElement.opacity * 100}%)`
 
-    // simple case: just a rectangle
-    if (this.modelElement.text === '') {
-      $(this.domElement)
-        .css({
-          width: this.modelElement.w,
-          height: this.modelElement.h,
-          'background-color': backgroundCss,
-          padding: 0,
-          'min-height': ''
-        })
-        .text('')
-
-      this.updateTransform()
-
-      return
-    }
-
+    // make outer rectangle
     $(this.domElement)
       .css({
-        width: (this.modelElement.w == null) ? 'auto' : this.modelElement.w - 2 * TEXT_PADDING,
+        width: (this.modelElement.w == null) ? 'auto' : this.modelElement.w,
         height: (this.modelElement.h == null) ? 'auto' : this.modelElement.h,
         'background-color': backgroundCss,
+        overflow: 'hidden auto',
+        display: 'flex',
+        'flex-direction': 'column',
+        'justify-content': 'center'
+      })
+      .empty()
+
+    if (this.modelElement.text !== '') {
+      const $textElement = $('<div>').css({
+        padding: TEXT_PADDING,
         color: this.modelElement.fontColor,
         'font-size': this.modelElement.fontSize,
-        'text-align': this.modelElement.alignment,
-        padding: `0 ${TEXT_PADDING}px`
+        'text-align': this.modelElement.alignment
       })
+        .appendTo(this.domElement)
 
-    if (this.modelElement.isPlainText) {
-      $(this.domElement).text(this.modelElement.text)
-    } else {
-      $(this.domElement).html(this.modelElement.text)
-    }
-
-    // Ensure that element background is at least big enough to cover text
-    const range = document.createRange()
-    range.selectNodeContents(this.domElement)
-    const clientRects = Array.from(range.getClientRects())
-    const [xMin, xMax, yMin, yMax] = clientRects.reduce(
-      ([xMin, xMax, yMin, yMax], { left, right, top, bottom }) =>
-        [Math.min(xMin, left), Math.max(xMax, right), Math.min(yMin, top), Math.max(yMax, bottom)],
-      [Number.MAX_VALUE, Number.MIN_VALUE, Number.MAX_VALUE, Number.MIN_VALUE])
-    const textWidth = xMax - xMin
-    const textHeight = yMax - yMin
-
-    this.modelElement.w = Math.max(this.modelElement.w || 0, textWidth + 2 * TEXT_PADDING)
-
-    let verticalPadding = TEXT_PADDING
-    if (this.modelElement.h == null) {
-      this.modelElement.h = textHeight + 2 * TEXT_PADDING
-    } else {
-      if ((this.modelElement.h - 2 * TEXT_PADDING) * zoomFactor <= textHeight) {
-        this.modelElement.h = (textHeight + 2 * TEXT_PADDING) / zoomFactor
+      if (this.modelElement.isPlainText) {
+        $textElement.text(this.modelElement.text)
       } else {
-        verticalPadding = (this.modelElement.h - textHeight / zoomFactor) / 2
+        $textElement.html(this.modelElement.text)
+      }
+
+      if ($textElement.height() > $(this.domElement).height()) {
+        $(this.domElement).css('justify-content', 'start')
+      }
+
+      if (this.modelElement.w == null || this.modelElement.h == null) {
+        const rect = this.domElement.getBoundingClientRect()
+        this.modelElement.w = this.modelElement.w || rect.width
+        this.modelElement.h = this.modelElement.h || rect.height
       }
     }
-    $(this.domElement).css({
-      width: this.modelElement.w - 2 * TEXT_PADDING,
-      height: this.modelElement.h - 2 * verticalPadding,
-      'min-height': textHeight,
-      padding: `${verticalPadding}px ${TEXT_PADDING}px`
-    })
 
     this.updateTransform()
   }
@@ -689,6 +658,8 @@ export class ConnectingView extends LinkView {
 
       this.arrow.update(start, end, this.modelElement.thickness, undefined, this.modelElement.color)
     }
+
+    this.updateTransform()
   }
 }
 

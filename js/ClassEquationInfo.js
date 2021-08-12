@@ -97,7 +97,7 @@ function showAsSheet ( type /*: VisualizerType*/ ) {
     var sheetElementsAsJSON = [
         {
             className : 'TextElement',
-            x : 50, y : 50, w : 150*fakeN+100, h : 50,
+            x : 50, y : 50, w : 150*fakeN+100,
             text : `Class Equation for the Group ${Group.name}`,
             fontSize : '20pt', alignment : 'center'
         }
@@ -108,12 +108,12 @@ function showAsSheet ( type /*: VisualizerType*/ ) {
         if ( fakeIndex == -1 ) { // draw the ellipses
             sheetElementsAsJSON.push( {
                 className : 'TextElement',
-                x : 50 + 150*i, y : 100, w : 100, h : 50,
+                x : 50 + 150*i, y : 100, w : 100,
                 text : '...', alignment : 'center'
             } );
             sheetElementsAsJSON.push( {
                 className : 'TextElement',
-                x : 50 + 150*i, y : 187, w : 100, h : 50,
+                x : 50 + 150*i, y : 187, w : 100,
                 text : '...', alignment : 'center'
             } );
         } else { // draw the acutal CC order and visualizer
@@ -121,14 +121,14 @@ function showAsSheet ( type /*: VisualizerType*/ ) {
             // First, its order as an integer:
             sheetElementsAsJSON.push( {
                 className : 'TextElement',
-                x : 50 + 150*i, y : 100, w : 100, h : 50,
+                x : 50 + 150*i, y : 100, w : 100,
                 text : `${Group.conjugacyClasses[fakeIndex].popcount()}`,
                 alignment : 'center'
             } );
             // Second, its visualization as highlighted elements in a visualizer:
             sheetElementsAsJSON.push( {
                 className : type, groupURL : Group.URL,
-                x : 50 + 150*i, y : 150, w : 100, h : 100,
+              x : 50 + 150*i, y : 150, w : 100, h : 100,
                 highlights : { background : addHighlights( fakeIndex ) }
             } );
         }
@@ -136,19 +136,19 @@ function showAsSheet ( type /*: VisualizerType*/ ) {
         // (always a "+" until the last step, which should be an "="):
         sheetElementsAsJSON.push( {
             className : 'TextElement',
-            x : 150 + 150*i, y : 100, w : 50, h : 50,
+            x : 150 + 150*i, y : 100, w : 50,
             text : ( fakeIndex < n - 1 ) ? '+' : '=', alignment : 'center'
         } );
         sheetElementsAsJSON.push( {
             className : 'TextElement',
-            x : 150 + 150*i, y : 187, w : 50, h : 50,
+            x : 150 + 150*i, y : 187, w : 50,
             text : ( fakeIndex < n - 1 ) ? '+' : '=', alignment : 'center'
         } );
     }
     // Add the group order in the top row:
     sheetElementsAsJSON.push( {
         className : 'TextElement',
-        x : 50 + 150*fakeN, y : 100, w : 100, h : 50,
+        x : 50 + 150*fakeN, y : 100, w : 100,
         text : `${Group.order}`,
         alignment : 'center'
     } );

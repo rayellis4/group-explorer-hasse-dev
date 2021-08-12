@@ -84,7 +84,7 @@ function showZmnIsomorphismSheet ( m /*: groupElement */, n /*: groupElement */ 
             className : 'TextElement',
             text : `Illustration of the isomorphism between ${prod(Z(m), Z(n))} and ${Z(m*n)}`,
             x : hmar, y : vmar,
-            w : 3*W + 2*hsep, h : hdrH,
+            w : 3*W + 2*hsep,
             fontSize : '20pt', alignment : 'center'
         },
         {
@@ -171,7 +171,7 @@ function showNoZmnIsomorphismSheet ( m /*: groupElement */, n /*: groupElement *
             className : 'TextElement',
           text : `Why there is no isomorphism between ${prod(Z(m), Z(n))} and ${Z(m*n)}`,
             x : hmar, y : vmar,
-            w : 3*W + 2*hsep, h : hdrH,
+            w : 3*W + 2*hsep,
             fontSize : '20pt', alignment : 'center'
         },
         {

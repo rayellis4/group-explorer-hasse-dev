@@ -404,23 +404,23 @@ function showAllVisualizersSheet () {
     CreateNewSheet( [
         {
             className : 'TextElement',
-            x : 50, y : 50, w : 800, h : 50,
+            x : 50, y : 50, w : 800,
             text : `All Visualizers for the Group ${Group.name}`,
             fontSize : '20pt', alignment : 'center'
         },
         {
             className : 'TextElement',
-            x : 50, y : 100, w : 200, h : 50,
+            x : 50, y : 100, w : 200,
             text : `Cayley Diagram`, alignment : 'center'
         },
         {
             className : 'TextElement',
-            x : 350, y : 100, w : 200, h : 50,
+            x : 350, y : 100, w : 200,
             text : `Multiplication Table`, alignment : 'center'
         },
         {
             className : 'TextElement',
-            x : 650, y : 100, w : 200, h : 50,
+            x : 650, y : 100, w : 200,
             text : `Cycle Graph`, alignment : 'center'
         },
         {
