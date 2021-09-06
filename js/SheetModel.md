@@ -32,7 +32,9 @@ const DEFAULT = {
     fontSize: '16px',
     fontColor: 'black',
     alignment: 'left',
-    isPlainText: false // text without special characters (e.g., <, >) renders fine in HTML, too
+    isPlainText: false, // text without special characters (e.g., <, >) renders the same in HTML
+    details: '',
+    enableScrolling: true
   },
 
   RectangleElement: {
@@ -94,6 +96,7 @@ export interface VizDisplay<VizDispJSON> {
 type SheetElementJSON = {|
   id?: string | number;
   className: ClassName;
+  details?: html;
 |}
 
 type NodeElementJSON = {|
@@ -115,7 +118,7 @@ type TextElementJSON = {|
   fontColor?: color;
   alignment?: 'left' | 'center' | 'right';
   isPlainText?: boolean;
-  details?: html;
+  enableScrolling?: boolean
 |}
 
 type VisualizerJSON = {|
@@ -288,6 +291,7 @@ export class SheetElement {
     id: string;
    +viewElement: SheetView.SheetView;
     z: integer;  // z-index
+    details: ?html; // comment, tooltip, etc.
 */
   get className () /*: ClassName */ {
     return ((this.constructor.name /*: any */) /*: ClassName */)
@@ -498,6 +502,7 @@ export class TextElement extends NodeElement {
     fontColor: color;
     alignment: 'left' | 'center' | 'right';
     isPlainText: boolean;
+    enableScrolling: boolean;
 */
   constructor () {
     super()

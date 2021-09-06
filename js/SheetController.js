@@ -113,7 +113,7 @@ function addEventListener (eventType /*: UIEventTypes */) {
     if (typeof eventMethod === 'string') {
       eventListeners.set(eventType, eventMethod)
       // $FlowFixMe -- Flow doesn't know about the 'change' event, doesn't seem to honor addEventListener(type: string...)
-      $('#bodyDouble')[0].addEventListener(eventType, eventListener)
+      $('#bodyDouble')[0].addEventListener(eventType, eventListener, GEUtils.isTouchDevice() ? { passive: false } : undefined )
     }
   }
 }
@@ -245,10 +245,13 @@ class TopSheetController extends AbstractController {
     const isLeftButton = event.button === 0
     const isRightButton = event.button === 2
     const modelElement = this.downModelElement
+    const target = ((event.target /*: any */) /*: HTMLElement */)
 
     if (isClick) {
       if (isLeftButton) {
-        if (modelElement instanceof Model.NodeElement) {
+        if ($(target).closest('.details')[0] != null) {
+          $(target).closest('.details').hide()
+        } else if (modelElement instanceof Model.NodeElement) {
           listener = new MoveResizeSelectedNode(modelElement, event) // select for move / resize
         }
       } else if (isRightButton) {
@@ -265,7 +268,8 @@ class TopSheetController extends AbstractController {
   }
 
   onClick (event /*: MouseEvent */) {
-    if ($(((event.target /*: any */) /*: HTMLElement */)).closest('#control-panel')[0] != null) {
+    const target = ((event.target /*: any */) /*: HTMLElement */)
+    if ($(target).closest('#control-panel')[0] != null) {
       listener = new Controls()
       listener.onClick(event)
     }
@@ -277,7 +281,8 @@ class TopSheetController extends AbstractController {
     if (event.touches.length === 1) {
       this.downTime = event.timeStamp
       this.downPosition = new View.WindowUnits(event)
-      const domElement = $(((event.target /*: any */) /*: HTMLElement */)).closest('.NodeElement, .LinkElement')[0]
+      const target = ((event.target /*: any */) /*: HTMLElement */)
+      const domElement = $(target).closest('.NodeElement, .LinkElement')[0]
       if (domElement != null) {
         this.downModelElement = ((Model.sheetElements.get(domElement.id) /*: any */) /*: Model.NodeElement */)
       }
@@ -306,16 +311,22 @@ class TopSheetController extends AbstractController {
   }
 
   onTouchEnd (event /*: TouchEvent */) {
+    const target = ((event.target /*: any */) /*: HTMLElement */)
     if (event.timeStamp - this.downTime <= 300 && event.touches.length === 0) {
       const touch = event.changedTouches[0]
       const modelElement = this.downModelElement
-      if (modelElement instanceof Model.NodeElement) {
+      if ($(target).closest('.details')[0] != null) {
+        $(target).closest('.details').hide()
+      } else if (modelElement instanceof Model.NodeElement) {
         listener = new ElementContextMenuController(modelElement, touch)
       } else if (modelElement instanceof Model.LinkElement) {
         listener = new EditController(modelElement, touch)
       }
     } else {
-      if (event.touches.length === 0 && this.downModelElement instanceof Model.NodeElement) {
+      if (event.touches.length === 0 &&
+          this.downModelElement instanceof Model.NodeElement &&
+          $(target).closest('.nodrag')[0] == null
+      ) {
         listener = new MoveResizeSelectedNode(this.downModelElement, event)
       }
     }
@@ -549,6 +560,9 @@ class ElementContextMenuController extends AbstractController {
     this.modelElement = modelElement
     this.$menu = placeMenu($('#element-context-menu'), event).show()
 
+    const hasDetails = 
+    $('#element-context-menu .Details')
+      .css('display', (this.modelElement.details == null || this.modelElement.details === '') ? 'none' : 'block')
     $('#element-context-menu .Node')
       .css('display', (this.modelElement instanceof Model.NodeElement) ? 'block' : 'none')
     $('#element-context-menu .Visualizer')
@@ -583,6 +597,11 @@ class ElementContextMenuController extends AbstractController {
   openInfo (event) {
     window.open('./GroupInfo.html?groupURL=' + ((this.modelElement /*: any */) /*: Model.VisualizerClass */).group.URL)
     reset()
+  }
+
+  showDetails (event) {
+    $(this.modelElement.viewElement.domElement).find('.details').show()
+    this.exit()
   }
 
   createLink (event /*: MouseEvent | TouchEvent */, controllerType /*: 'Connector' | 'Morphism' | void */) {
@@ -942,6 +961,7 @@ class DragAndDrop {
   static dragStart (event /*: MouseEvent | TouchEvent */) {
     const isDragStart =
       $(((event.target /*: any */) /*: HTMLElement */)).closest('.draggable')[0] != null &&
+      $(((event.target /*: any */) /*: HTMLElement */)).closest('.nodrag')[0] == null &&
       $(((event.target /*: any */) /*: HTMLElement */)).closest('input')[0] == null && // range & text
       $(((event.target /*: any */) /*: HTMLElement */)).closest('textarea')[0] == null
 

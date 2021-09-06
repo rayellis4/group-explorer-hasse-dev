@@ -35,6 +35,10 @@
              --light-border: #989898;
          }
 
+         .details:hover {
+             display: block;
+         }
+
          button {
              background-image: var(--light-gradient);
          }
@@ -281,142 +285,144 @@
                 <div id="heading">Group Explorer Sheet</div>
             </div>
             <div id="graphic-container">
-            <div id="graphic" onchange="$(event.target).filter('.echoed').siblings().val($(event.target).val())">
-                <div id="halo" class="hidden"></div>
+                <div id="graphic" style="z-index: 0; touch-action: none"
+                     onchange="$(event.target).filter('.echoed').siblings().val($(event.target).val())">
+                    <div id="halo" class="hidden"></div>
 
-                <div id="element-context-menu" data-action="() => void 0" class="context-menu">
-                    <div  data-action="listener = new MoveResizeSelectedNode(this.modelElement, event)"
-                          class="Node choice">Resize</div>
-                    <div data-action="this.createEditor(event)" class="choice">Edit</div>
-                    <div data-action="this.openInfo(event)" class="Visualizer choice">Group Info</div>
-                    <div data-action="this.modelElement.copy(), this.exit()" class="Node choice">Copy</div>
-                    <hr class="Node">
-                    <div data-action="this.createLink(event, 'Connector')" class="Node choice">Create Connection</div>
-                    <div data-action="this.createLink(event, 'Morphism')" class="Visualizer choice">Create Map</div>
-                    <hr class="Node">
-                    <div data-action="this.modelElement.moveForward()" class="Node choice">Move Forward</div>
-                    <div data-action="this.modelElement.moveBackward()" class="Node choice">Move Backward</div>
-                    <div data-action="this.modelElement.moveToFront()" class="Node choice">Move to Front</div>
-                    <div data-action="this.modelElement.moveToBack()" class="Node choice">Move to Back</div>
-                    <hr>
-                    <div data-action="this.modelElement.destroy(), this.exit()" class="choice">Delete</div>
-                </div>
-            </div>
-
-            <div id="control-panel">
-                <div id="add-element">
-                    <p>Add element:</p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 1em">
-                        <button data-action="this.addElement('RectangleElement')">Rectangle</button>
-                        <button data-action="this.addElement('TextElement')">Text box</button>
+                    <div id="element-context-menu" data-action="() => void 0" class="context-menu">
+                        <div  data-action="listener = new MoveResizeSelectedNode(this.modelElement, event)"
+                              class="Node choice">Resize</div>
+                        <div data-action="this.createEditor(event)" class="choice">Edit</div>
+                        <div data-action="this.showDetails(event)" class="Details choice">Show details</div>
+                        <div data-action="this.openInfo(event)" class="Visualizer choice">Group Info</div>
+                        <div data-action="this.modelElement.copy(), this.exit()" class="Node choice">Copy</div>
+                        <hr class="Node">
+                        <div data-action="this.createLink(event, 'Connector')" class="Node choice">Create Connection</div>
+                        <div data-action="this.createLink(event, 'Morphism')" class="Visualizer choice">Create Map</div>
+                        <hr class="Node">
+                        <div data-action="this.modelElement.moveForward()" class="Node choice">Move Forward</div>
+                        <div data-action="this.modelElement.moveBackward()" class="Node choice">Move Backward</div>
+                        <div data-action="this.modelElement.moveToFront()" class="Node choice">Move to Front</div>
+                        <div data-action="this.modelElement.moveToBack()" class="Node choice">Move to Back</div>
+                        <hr>
+                        <div data-action="this.modelElement.destroy(), this.exit()" class="choice">Delete</div>
                     </div>
                 </div>
 
-                <div id="add-visualizer">
-                    <p>Add visualizer:</p>
-
-                    <div id="visualizer-select-group"
-                         onclick="$('#visualizer-select-group .faux-select-options').toggle(); event.stopPropagation()">
-                        <span>Group:</span>
-                        <div class="faux-select">
-                            <div class="faux-select-arrow"></div>
-                            <span class="faux-select-value"></span>
-                            <ol class="faux-select-options hidden display-none-on-clean"></ol>
+                <div id="control-panel">
+                    <div id="add-element">
+                        <p>Add element:</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 1em">
+                            <button data-action="this.addElement('RectangleElement')">Rectangle</button>
+                            <button data-action="this.addElement('TextElement')">Text box</button>
                         </div>
-                        <template id="visualizer-group-list-entry">
-                            <span data-groupURL="${group.URL}">${group.name}</span>
+                    </div>
+
+                    <div id="add-visualizer">
+                        <p>Add visualizer:</p>
+
+                        <div id="visualizer-select-group"
+                             onclick="$('#visualizer-select-group .faux-select-options').toggle(); event.stopPropagation()">
+                            <span>Group:</span>
+                            <div class="faux-select">
+                                <div class="faux-select-arrow"></div>
+                                <span class="faux-select-value"></span>
+                                <ol class="faux-select-options hidden display-none-on-clean"></ol>
+                            </div>
+                            <template id="visualizer-group-list-entry">
+                                <span data-groupURL="${group.URL}">${group.name}</span>
+                            </template>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; margin-bottom: 0.5em">
+                            <button data-action="this.addElement('CDElement')">Cayley<br>diagram</button>
+                            <button data-action="this.addElement('MTElement')">Multiplication<br>table</button>
+                            <button data-action="this.addElement('CGElement')">Cycle<br>graph</button>
+                        </div>
+                    </div>
+
+                    <p style="font-size: large; margin-block-start: 2em">Right-click/tap any object in the sheet for more options</p>
+
+                    <div id="stored-sheets">
+                        <p>Stored sheets:</p>
+                        <ul id="stored-sheet-list" data-action="this.showStoredSheetMenu(event)"></ul>
+                        <template id="stored-sheets-list-empty-entry-template">
+                            <li style="padding: 0 1em"><i>(None)</i></li>
                         </template>
+                        <template id="stored-sheets-list-entry-template">
+                            <li style="padding: 0 1em" class="choice">${sheetName}</li>
+                        </template>
+
+                        <div id="new-sheet-dialog" class="draggable hidden controls-modal" data-action="() => void 0"
+                             style="position: fixed; padding: 1em; background-color: white; z-index: 1000">
+                            <div>Enter new stored sheet name (may have HTML):</div>
+                            <input id="new-sheet-value" type="text" placeholder="My new sheet" minlength="1" maxlength="120"
+                                   onkeydown="if (event.key == 'Enter') $('#new-sheet-dialog button:first-of-type').click()"
+                                   style="font-size: inherit; margin: 0.5em 0; width: 25em">
+                            <div style="padding: 0.5em 2em 0">
+                                <button data-action="this.saveNewSheet()" style="width: 5em">OK</button>
+                                <button style="width: 5em; float: right" data-action="this.exit()">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div id="import-sheet-dialog" class="draggable hidden controls-modal"
+                             data-action="() => void 0"
+                             style="position: fixed; padding: 1em; background-color: white">
+                            <div>Enter sheet data to import (JSON):</div>
+                            <textarea id="import-sheet-value" cols="40" rows="5"
+                                      style="font-size: inherit; margin: 0.5em 0; resize: none"></textarea>
+                            </textarea>
+                            <div style="padding: 0.5em 2em 0">
+                                <button style="width: 5em" data-action="this.importSheetData()">OK</button>
+                                <button style="width: 5em; float: right" data-action="this.exit()">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div id="export-sheet-dialog" class="draggable hidden controls-modal"
+                             data-action="() => void 0"
+                             style="position: fixed; padding: 1em; background-color: white">
+                            <div>Sheet export data (JSON):</div>
+                            <textarea id="export-sheet-value" cols="40" rows="5"
+                                      style="font-size: inherit; margin: 0.5em 0; resize: none">
+                            </textarea>
+                            <div style="padding: 0.5em 2em 0">
+                                <button data-action="this.exit()"
+                                        style="width: 5em; display: block; margin: auto">OK</button>
+                            </div>
+                        </div>
+
+                        <div id="stored-sheets-menu" class="context-menu hidden display-none-on-clean"
+                             style="position: fixed; left: 4em">
+                            <ul style="list-style: none; margin-block-start: 0; margin-block-end: 0; padding-inline-start: 0; ">
+                                <li data-action="this.loadSheet(event)" class="choice">Load to current sheet</li>
+                                <li data-action="this.saveSheet(event)" class="choice">Update from current sheet</li>
+                                <li data-action="this.deleteSheet(event)" class="choice">Delete</li>
+                                <hr>
+                                <li data-action="this.createSheet(event)" class="choice">Save current sheet</li>
+                                <li data-action="this.exportSheet(event)" class="choice">Export current sheet as JSON</li>
+                                <li data-action="this.importSheet(event)" class="choice">Import JSON to current sheet</li>
+                                <li data-action="Controls.loadStoredSheets(event); this.exit()" class="choice">Refresh list</li>
+                            </ul>
+                        </div>
+
+                        <div id="empty-stored-sheets-menu" class="context-menu hidden display-none-on-clean"
+                             style="position: fixed; left: 4em">
+                            <ul style="list-style: none; margin-block-start: 0; margin-block-end: 0; padding-inline-start: 0; ">
+                                <li data-action="this.createSheet(event)" class="choice">Save current sheet</li>
+                                <li data-action="this.exportSheet(event)" class="choice">Export current sheet as JSON</li>
+                                <li data-action="this.importSheet(event)" class="choice">Import JSON to current sheet</li>
+                                <li data-action="Controls.loadStoredSheets(event); this.exit()" class="choice">Refresh list</li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; margin-bottom: 0.5em">
-                        <button data-action="this.addElement('CDElement')">Cayley<br>diagram</button>
-                        <button data-action="this.addElement('MTElement')">Multiplication<br>table</button>
-                        <button data-action="this.addElement('CGElement')">Cycle<br>graph</button>
-                    </div>
+                    <div id="redisplay-sheets" style="margin-bottom: 2em">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr">
+                            <button data-action="View.redrawAll(); this.exit()">Redraw</button>
+                            <button data-action="Model.clear(); this.exit()">Clear</button>
+                        </div>
+                    </div>                    
                 </div>
-
-                <p style="font-size: large; margin-block-start: 2em">Right-click/tap any object in the sheet for more options</p>
-
-                <div id="stored-sheets">
-                    <p>Stored sheets:</p>
-                    <ul id="stored-sheet-list" data-action="this.showStoredSheetMenu(event)"></ul>
-                    <template id="stored-sheets-list-empty-entry-template">
-                        <li style="padding: 0 1em"><i>(None)</i></li>
-                    </template>
-                    <template id="stored-sheets-list-entry-template">
-                        <li style="padding: 0 1em" class="choice">${sheetName}</li>
-                    </template>
-
-                    <div id="new-sheet-dialog" class="draggable hidden controls-modal" data-action="() => void 0"
-                         style="position: fixed; padding: 1em; background-color: white; z-index: 1000">
-                        <div>Enter new stored sheet name (may have HTML):</div>
-                        <input id="new-sheet-value" type="text" placeholder="My new sheet" minlength="1" maxlength="120"
-                               onkeydown="if (event.key == 'Enter') $('#new-sheet-dialog button:first-of-type').click()"
-                               style="font-size: inherit; margin: 0.5em 0; width: 25em">
-                        <div style="padding: 0.5em 2em 0">
-                            <button data-action="this.saveNewSheet()" style="width: 5em">OK</button>
-                            <button style="width: 5em; float: right" data-action="this.exit()">Cancel</button>
-                        </div>
-                    </div>
-
-                    <div id="import-sheet-dialog" class="draggable hidden controls-modal"
-                         data-action="() => void 0"
-                         style="position: fixed; padding: 1em; background-color: white">
-                        <div>Enter sheet data to import (JSON):</div>
-                        <textarea id="import-sheet-value" cols="40" rows="5"
-                                  style="font-size: inherit; margin: 0.5em 0; resize: none"></textarea>
-                        </textarea>
-                        <div style="padding: 0.5em 2em 0">
-                            <button style="width: 5em" data-action="this.importSheetData()">OK</button>
-                            <button style="width: 5em; float: right" data-action="this.exit()">Cancel</button>
-                        </div>
-                    </div>
-
-                    <div id="export-sheet-dialog" class="draggable hidden controls-modal"
-                         data-action="() => void 0"
-                         style="position: fixed; padding: 1em; background-color: white">
-                        <div>Sheet export data (JSON):</div>
-                        <textarea id="export-sheet-value" cols="40" rows="5"
-                                  style="font-size: inherit; margin: 0.5em 0; resize: none">
-                        </textarea>
-                        <div style="padding: 0.5em 2em 0">
-                            <button data-action="this.exit()"
-                                    style="width: 5em; display: block; margin: auto">OK</button>
-                        </div>
-                    </div>
-
-                    <div id="stored-sheets-menu" class="context-menu hidden display-none-on-clean"
-                         style="position: fixed; left: 4em">
-                        <ul style="list-style: none; margin-block-start: 0; margin-block-end: 0; padding-inline-start: 0; ">
-                            <li data-action="this.loadSheet(event)" class="choice">Load to current sheet</li>
-                            <li data-action="this.saveSheet(event)" class="choice">Update from current sheet</li>
-                            <li data-action="this.deleteSheet(event)" class="choice">Delete</li>
-                            <hr>
-                            <li data-action="this.createSheet(event)" class="choice">Save current sheet</li>
-                            <li data-action="this.exportSheet(event)" class="choice">Export current sheet as JSON</li>
-                            <li data-action="this.importSheet(event)" class="choice">Import JSON to current sheet</li>
-                            <li data-action="Controls.loadStoredSheets(event); this.exit()" class="choice">Refresh list</li>
-                        </ul>
-                    </div>
-
-                    <div id="empty-stored-sheets-menu" class="context-menu hidden display-none-on-clean"
-                         style="position: fixed; left: 4em">
-                        <ul style="list-style: none; margin-block-start: 0; margin-block-end: 0; padding-inline-start: 0; ">
-                            <li data-action="this.createSheet(event)" class="choice">Save current sheet</li>
-                            <li data-action="this.exportSheet(event)" class="choice">Export current sheet as JSON</li>
-                            <li data-action="this.importSheet(event)" class="choice">Import JSON to current sheet</li>
-                            <li data-action="Controls.loadStoredSheets(event); this.exit()" class="choice">Refresh list</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div id="redisplay-sheets" style="margin-bottom: 2em">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr">
-                        <button data-action="View.redrawAll(); this.exit()">Redraw</button>
-                        <button data-action="Model.clear(); this.exit()">Clear</button>
-                    </div>
-                </div>                    
-            </div>
             </div>
 
             <!-- Model element editors
@@ -445,6 +451,11 @@
                            data-onload="$(this).prop('checked', model.isPlainText)"
                            data-onupdate="model.isPlainText = $(this).prop('checked')">
                     <label for="displayAsHTML">Display as plain text (not HTML)</label>
+                </p>
+                <p>Details:<br>
+                    <textarea rows="4" cols="50"
+                              data-onload="$(this).val(model.details)"
+                              data-onupdate="model.details = $(this).val().trim()"></textarea><br>
                 </p>
                 <p>Text color:
                     <input type="color" style="margin-left: 1em"

@@ -308,14 +308,15 @@ export class RectangleView extends NodeView {
   }
 }
 
-const TEXT_PADDING = 10
+const TEXT_PADDING = '0.1em'
 export class TextView extends NodeView {
+  
   /*::
     +modelElement: SheetModel.TextElement
   */
   constructor (modelElement /*: SheetModel.TextElement */, domElement /*: HTMLElement */) {
     super(modelElement, domElement)
-    this.redraw()
+    this.draw()
     this.updateZ()
   }
 
@@ -323,50 +324,101 @@ export class TextView extends NodeView {
     $(this.domElement).css('transform', makeCssTransform(zoomFactor, undefined, this.position.toGraphicUnits()))
   }
 
+  draw () {
+    const $domElement = $(this.domElement)
+
+    // box within a box -- outer box scrolls, inner box actually has text
+    if (this.modelElement.enableScrolling) {
+      const $scrollContainer = $('<div class="scrollContainer">')
+        .css({
+          overflow: 'hidden auto',
+          display: 'flex',
+          'flex-direction': 'column',
+          'justify-content': 'center',
+          width: '100%',
+          height: '100%'
+        })
+        .appendTo($domElement)
+
+      $('<div class="scrollingText">')
+        .css({
+          padding: TEXT_PADDING
+        })
+        .appendTo($scrollContainer)
+    } else {
+      $domElement.html(this.modelElement.text)
+      this.modelElement.text = $domElement.html()
+    }
+
+    // build details, hidden initially
+    $('<div class="details">')
+      .css({
+        position: 'relative',
+        top: '0.4em',
+        'font-size': '14pt',
+        'background-color': '#DDDDDD',
+        color: 'black',
+        width: 'fit-content',
+        'text-align': 'left',
+        display: 'none'
+      })
+      .appendTo($domElement)
+
+    this.redraw()
+
+    // on first time through update auto-sized modelElement with actual size
+    if (this.modelElement.w == null || this.modelElement.h == null) {
+      const rect = this.domElement.getBoundingClientRect()
+      this.modelElement.w = this.modelElement.w || rect.width
+      this.modelElement.h = this.modelElement.h || rect.height
+    }
+  }
+
   redraw () {
     // combine color and opacity into an rgba color for transparent/translucent colors
     const background = new THREE.Color(this.modelElement.color)
-    const backgroundCss = (this.modelElement.opacity === 1)
-      ? '#' + background.getHexString()
-      : `rgba(${background.r * 100}%, ${background.g * 100}%, ${background.b * 100}%, ${this.modelElement.opacity * 100}%)`
+    const backgroundCss =
+      `rgba(${background.r * 100}%, ${background.g * 100}%, ${background.b * 100}%, ${this.modelElement.opacity * 100}%)`
 
-    // make outer rectangle
-    $(this.domElement)
+    // set outer rectangle size, background color
+    const $domElement = $(this.domElement)
       .css({
         width: (this.modelElement.w == null) ? 'auto' : this.modelElement.w,
         height: (this.modelElement.h == null) ? 'auto' : this.modelElement.h,
-        'background-color': backgroundCss,
-        overflow: 'hidden auto',
-        display: 'flex',
-        'flex-direction': 'column',
-        'justify-content': 'center'
+        'background-color': backgroundCss
       })
-      .empty()
 
-    if (this.modelElement.text !== '') {
-      const $textElement = $('<div>').css({
-        padding: TEXT_PADDING,
-        color: this.modelElement.fontColor,
-        'font-size': this.modelElement.fontSize,
-        'text-align': this.modelElement.alignment
-      })
-        .appendTo(this.domElement)
+    if (this.modelElement.enableScrolling) { // scrolling is handled by this code
+      const $scrollingText = $(this.domElement).find('.scrollingText')
+        .css({
+          color: this.modelElement.fontColor,
+          'font-size': this.modelElement.fontSize,
+          'text-align': this.modelElement.alignment
+        })
 
       if (this.modelElement.isPlainText) {
-        $textElement.text(this.modelElement.text)
+        $scrollingText.text(this.modelElement.text)
       } else {
-        $textElement.html(this.modelElement.text)
+        $scrollingText.html(this.modelElement.text)
       }
 
-      if ($textElement.height() > $(this.domElement).height()) {
-        $(this.domElement).css('justify-content', 'start')
+      const $scrollContainer = $(this.domElement).find('.scrollContainer')
+      if ($scrollingText.height() > $scrollContainer.height()) {
+        $scrollContainer.css('justify-content', 'start')
       }
+    } else { // scrolling is handled by client code
+      if (this.modelElement.text !== $domElement.html()) {
+        $domElement.html(this.modelElement.text)
+        this.modelElement.text = $domElement.html()
+      }
+    }
 
-      if (this.modelElement.w == null || this.modelElement.h == null) {
-        const rect = this.domElement.getBoundingClientRect()
-        this.modelElement.w = this.modelElement.w || rect.width
-        this.modelElement.h = this.modelElement.h || rect.height
-      }
+    // update details
+    const currentDetails = $domElement.find('.details').html() || ''
+    const modelDetails = this.modelElement.details || ''
+    if (modelDetails !== currentDetails) {
+      $domElement.find('.details').html(modelDetails)
+      this.modelElement.details = $domElement.find('.details').html()
     }
 
     this.updateTransform()

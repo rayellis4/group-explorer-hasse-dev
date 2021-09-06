@@ -22,8 +22,9 @@
         highlighted portions of the whole group, connected by the identity (inclusion)
         homomorphism. You may see that lattice by
         <a href="" data-action="SubgroupInfo.showSubgroupLattice('CDElement')">Cayley diagram</a>,
-        <a href="" data-action="SubgroupInfo.showSubgroupLattice('CGElement')">cycle graph</a>, or
+        <a href="" data-action="SubgroupInfo.showSubgroupLattice('CGElement')">cycle graph</a>,
         <a href="" data-action="SubgroupInfo.showSubgroupLattice('MTElement')">multiplication table</a>, or
+        <a href="" data-action="SubgroupInfo.showSubgroupLattice('Hasse')">Hasse diagram</a>,
         by calculation:</p>
     <button class="gap-compute" style="grid-column: content / end; margin-left: 1em"
             data-action="ShowGAPCode.setup('getting the lattice of subgroups of a group', Group)">Compute this in GAP</button>
@@ -117,4 +118,18 @@
     <li class="subgroups-no-quotient-group">I cannot show you the quotient group
         right now (see <a href="#subgroups-no-quotient-group-reason">below**</a>).
     </li>
+</template>
+
+<template id="subgroups-listing-template">
+    <div id="subgroup-listing"
+         style="display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: auto; width: 100%; height: 100%">
+        <div style="font-size: 16pt; padding: 0.5em; text-align: center">Subgroup key</div>
+        <div id="subgroup-listing-keys" class="nodrag"
+             style="overflow: hidden auto; padding: 0 1em; background-color: #ececec">${subgroupLines}
+        </div>
+        <div id="subgroup-listing-footer" style="padding-top: 0.5em; width: fit-content">
+            Right-click/tap-hold on individual subgroup to show context menu,
+            and select "Show details" for more information
+        </div>
+    </div>
 </template>

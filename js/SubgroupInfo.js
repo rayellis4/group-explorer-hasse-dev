@@ -160,7 +160,7 @@ function highlightSubgroup ( H /*: Subgroup */ ) {
    return Array( Group.order ).fill( '' ).map( ( e /*: color */, i ) =>
       H.members.isSet( i ) ? 'hsl(0, 100%, 80%)' : e );
 }
-function showSubgroupLattice ( type /*: VisualizerName */ ) {
+function showSubgroupLattice ( type /*: VisualizerName | 'Hasse' */ ) {
    // Handy function
    function subset ( H /*: Subgroup */, K /*: Subgroup */ ) /*: boolean */ { return K.members.contains( H.members ); }
    // Let's tier the group's subgroups by order.
@@ -218,7 +218,8 @@ function showSubgroupLattice ( type /*: VisualizerName */ ) {
    // the sheet for a visualizer of the subgroup.
    const hSize = chains.length, vSize = chains[0].length,
          cellWidth = Math.min( 300, Math.ceil( 0.9 * Math.min(window.innerWidth / hSize, window.innerHeight / (1.5 * vSize)) ) ),
-         cellHeight = cellWidth * 1.5,
+//         cellHeight = cellWidth * 1.5,
+         cellHeight = 0.9 * ($('body').height() - $('#header').height()) / vSize, // cellWidth * 1.5,
          hMargin = Math.ceil( cellWidth * 0.1 ),
          vMargin = hMargin + ( cellHeight - cellWidth ) / 2,
          latticeTop = 100, latticeLeft = 50,
@@ -237,43 +238,89 @@ function showSubgroupLattice ( type /*: VisualizerName */ ) {
       }
       return { x : latticeLeft + x, y : latticeTop + y };
    }
-   // Build a sheet with subgroups shown at those locations.
-   const sheetElementsAsJSON /*: Array<SheetCreateJSON> */ = [ ];
-   Group.subgroups.map( (H /*: Subgroup */) => {
-      const pos = subgroupPosition( H );
-      sheetElementsAsJSON.push( {
-         className : type, groupURL : Group.URL,
-         x : pos.x + hMargin, y : pos.y + vMargin,
-         w : cellWidth - 2 * hMargin, h : cellHeight - 2 * vMargin,
-         highlights : { background : highlightSubgroup( H ) }
-      } );
-            
-      
-/* Haas diagram?
-      if (type === 'TextElement') {
-         const subgroupIndex = Group.subgroups.findIndex((g) => g == H)
-         const caption = `<span display="inline-block"><i>H</i><sub>${subgroupIndex}</sub>&nbsp;=&nbsp⟨ </span>` +
-            H.generators.toArray().map((gen) => '<span display="inline-block">' + Group.representation[gen]).join(', </span>') +
-            '</span>&nbsp;⟩'
-         console.log(caption)
-         const myHMargin = hMargin
-         sheetElement = {
-            className: 'TextElement',
-            text: caption,
-            fontColor: 'black',
-            color: '#d8d8d8',
-            alignment: 'center',
-            fontSize: cellHeight/15 + 'px',
-            x: pos.x + myHMargin,
-            y: pos.y + vMargin,
-            w: cellWidth - 2 * myHMargin,
-            h: 0
-         }
-*/
 
-   } );
+   function caption (H /*: Subgroup */) /*: html */ {
+      const subgroupIndex = Group.subgroups.findIndex((subgroup) => subgroup === H)
+      const heading = `<i>H</i><sub>${subgroupIndex}</sub>`
+      return heading
+   }
+
+   function detail (H /*: Subgroup */) /*: html */ {
+      const subgroupId = `<i>H</i><sub>${Group.subgroups.findIndex((subgroup) => subgroup === H)}</sub> `
+      const generators = `\n${subgroupId}Generators:&nbsp;<br>\n<span style="white-space: nowrap; margin-left: 0.5em">⟨ ` +
+            H.generators.toArray().map((gen) => Group.representation[gen]).join(', ') +
+            ' ⟩</span>'
+      let elements = `\nElements:&nbsp;<br>`
+      if (Group.representation[0][0] === '(') {
+         elements += H.members
+            .toArray()
+            .map((el) => '\n<span style="white-space: nowrap; margin-left: 0.5em">' + Group.representation[el] + '</span>')
+            .join('<br>')
+      } else {
+         const hRepresentations = H.members.toArray().map((el) => Group.representation[el])
+         const elementsPerLine = 20
+         for (let inx = 0; inx * elementsPerLine < H.order; inx++) {
+            const start = inx * elementsPerLine
+            const end = Math.min(start + elementsPerLine, H.order)
+            elements += '<span style="white-space: nowrap; margin-left: 0.5em">' + hRepresentations.slice(start, end).join(', ') + '</span><br>\n'
+         }
+      }
+      const detail = `<div style="padding: 0.2em">${generators}<br>${elements}</div>\n`
+
+      return detail
+   }
+   
+   // Build a sheet with subgroups shown at those locations.
+   const sheetElementsAsJSON /*: Array<SheetCreateJSON> */ = Group.subgroups.map(
+     (H /*: Subgroup */) => {
+       const pos = subgroupPosition( H );
+       const sheetElement = (type === 'Hasse') ?
+         { className: 'TextElement',
+           text: caption(H),
+           fontColor: 'black',
+           color: '#f8f8f8',
+           alignment: 'center',
+           fontSize: cellWidth / 2.5 + 'px',
+           x: pos.x + (hMargin - 5),
+           y: pos.y + vMargin,
+           details: detail(H)
+         } :
+         { className : type, groupURL : Group.URL,
+           x : pos.x + hMargin, y : pos.y + vMargin,
+           w : cellWidth - 2 * hMargin, h : cellHeight - 2 * vMargin,
+           highlights : { background : highlightSubgroup( H ) }
+         }
+       return sheetElement
+     })
+
+   // add Subgroup Generator list to upper right-hand corner of Hasse diagram
+   if (type === 'Hasse') {
+      function makeSubgroupListingText () {
+         const subgroupGenerators = (H, inx) => H.generators.toArray().map((el) => Group.representation[el]).join(', ')
+         const subgroupLines =
+	       Group
+               .subgroups
+               .map((H, inx) => `\n<i>H</i><sub>${inx}</sub> = ⟨ ${subgroupGenerators(H, inx)} ⟩`)
+               .join('<br>')
+
+         const indexHTML = eval(Template.HTML('subgroups-listing-template'))
+         
+         return indexHTML
+      }
+
+      const latticeRight = Math.max(...Group.subgroups.map((H) => subgroupPosition(H).x)) + cellWidth
+      const subgroupListingLeft = Math.min(window.innerWidth - 800, latticeRight + 100)
+      sheetElementsAsJSON.push({
+         className: 'TextElement',
+         text: makeSubgroupListingText(), enableScrolling: false,
+         x: subgroupListingLeft, y: latticeTop,
+         w: 450, h: 275,
+         fontSize: '14pt', alignment: 'left', color: '#d1d1d1'
+      })
+   }
+   
    // Connect every pair of subgroups that don't have an intermediate connection.
-   function existsIntermediateSubgroup ( H /*: Subgroup */, K /*: Subgroup */ ) /*: boolean */ {
+   function existsIntermediateSubgroup (H /*: Subgroup */, K /*: Subgroup */) /*: boolean */ {
       for ( var i = 0 ; i < Group.subgroups.length ; i++ ) {
          const considerMe = Group.subgroups[i];
          if ( ( H != considerMe ) && ( K != considerMe )
@@ -302,7 +349,7 @@ function showSubgroupLattice ( type /*: VisualizerName */ ) {
       fontSize : '20pt', alignment : 'center'
    } );
    // Show the sheet.
-   SheetModel.createNewSheet(sheetElementsAsJSON);
+   SheetModel.createNewSheet( sheetElementsAsJSON );
 }
 
 function showEmbeddingSheet ( indexOfH /*: number */, type /*: VisualizerName */ ) {
@@ -332,12 +379,12 @@ function showEmbeddingSheet ( indexOfH /*: number */, type /*: VisualizerName */
       },
       {
          className : 'MorphismElement',
-         sourceId : '1', destinationId : '2', name : '<i>e</i>',
+         sourceId : 1, destinationId : 2, name : '<i>e</i>',
          definingPairs : libraryH.generators[0].map( gen =>
             [ gen, embedding[gen] ] ),
          showManyArrows : true, showInjectionSurjection : true
       }
-   ] )
+   ] );
 }
 
 function showQuotientSheet ( indexOfN /*: number */, type /*: VisualizerName */) {
